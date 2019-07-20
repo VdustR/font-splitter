@@ -33,7 +33,7 @@ Usage: font-splitter [options] <fontPath>
 Options:
   -v, --version          output the version number
   -c, --chunk <chunk>    chunk size, `-` stand for infinity, default: 256
-  -f, --flavor <flavor>  font flavor: otf, ttf, woff, woff2
+  -f, --flavor <flavor>  font flavor: woff, woff2
   -n, --family <family>  font family, default: parsed from font
   -s, --style <style>    font style, default: normal
   -w, --weight <weight>  font weight, default: 400
