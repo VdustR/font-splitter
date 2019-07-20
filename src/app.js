@@ -150,7 +150,7 @@ const genCss = ({
   fontFamily,
   locals,
   results,
-  style,
+  italic,
   weight,
   output,
   fontPath,
@@ -166,7 +166,7 @@ const genCss = ({
     .map(result =>
       compiled({
         fontFamily,
-        fontStyle: style,
+        fontStyle: italic ? 'italic' : 'normal',
         fontWeight: weight,
         src: [
           ...locals.map(local => `local('${local}')`),
@@ -189,7 +189,7 @@ const genSubsets = ({
   fontPath,
   chunkSize,
   family,
-  style,
+  italic,
   weight,
   dryRun,
   quite,
@@ -231,7 +231,7 @@ const genSubsets = ({
     fontFamily,
     locals,
     results,
-    style,
+    italic,
     weight,
     output,
     fontPath,

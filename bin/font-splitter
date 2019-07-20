@@ -26,7 +26,7 @@ program.option(
   '-n, --family <family>',
   'font family, default: parsed from font'
 );
-program.option('-s, --style <style>', 'font style, default: normal');
+program.option('-i, --italic', 'italic font style, default: false');
 program.option('-w, --weight <weight>', 'font weight, default: 400', parseInt);
 program.option('-d, --dry', 'dry run');
 program.option('-q, --quite', 'disable stdout');
@@ -41,7 +41,7 @@ if (!flavors.includes(flavor)) quit();
 const output = resolve(program.output || 'output');
 const chunkSize = program.chunk || 1024;
 const family = program.family;
-const style = program.style || 'normal';
+const italic = program.italic;
 const weight = program.weight || 400;
 const dryRun = program.dry;
 const quite = program.quite;
@@ -62,7 +62,7 @@ split({
   fontPath,
   chunkSize,
   family,
-  style,
+  italic,
   weight,
   dryRun,
   quite,
