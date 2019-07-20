@@ -5,7 +5,7 @@ const pkg = require('../package.json');
 const split = require('../src/app');
 const resolve = require('../src/resolve');
 
-const flavors = ['otf', 'ttf', 'woff', 'woff2'];
+const flavors = ['woff', 'woff2'];
 
 let fontPath = null;
 

@@ -153,6 +153,7 @@ const getSplitTargets = ({ codeBlocks, codes, chunkSize }) => {
 };
 
 const genCss = ({
+  flavor,
   fontFamily,
   locals,
   results,
@@ -176,7 +177,7 @@ const genCss = ({
         fontWeight: weight,
         src: [
           ...locals.map(local => `local('${local}')`),
-          `url(${result.targetFontName})`,
+          `url(${result.targetFontName}) format('${flavor}')`,
         ].join(', '),
         unicodeRange: getUnicodeRanges(result.codes).join(', '),
       })
@@ -233,6 +234,7 @@ const genSubsets = ({
   log('Fonts generated!');
   log('CSS generating...');
   genCss({
+    flavor,
     fontFamily,
     locals,
     results,
