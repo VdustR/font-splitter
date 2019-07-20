@@ -24,20 +24,13 @@ const getFontName = fontPath => {
     ...[
       ...matchAll(
         name,
-        /<namerecord (?:[^>]+ )?nameID="(1|2|4|6)"(?: [^>]+)>[\n\s]*([^<\n]+)[\n\s]*<\/namerecord>/g
+        /<namerecord (?:[^>]+ )?nameID="(1|4|6)"(?: [^>]+)>[\n\s]*([^<\n]+)[\n\s]*<\/namerecord>/g
       ),
     ].map(([, id, value]) => ({ [id]: value }))
   );
-  const fontNameOrigin = data[1];
-  const fontWeight = data[2];
+  const fontFamily = data[1];
   const fontFullName = data[4];
   const fileName = data[6];
-  const fontFamily =
-    fontNameOrigin.substr(0 - fontWeight.length) === fontWeight
-      ? fontNameOrigin
-          .substring(0, fontNameOrigin.length - fontWeight.length)
-          .trim()
-      : fontNameOrigin;
   const locals = [fontFullName, fileName];
   return { fontFamily, locals };
 };
