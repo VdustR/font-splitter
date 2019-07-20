@@ -1,0 +1,69 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const pkg = require('../package.json');
+const split = require('../src/app');
+const resolve = require('../src/resolve');
+
+const flavors = ['otf', 'ttf', 'woff', 'woff2'];
+
+let fontPath = null;
+
+const quit = () => {
+  program.outputHelp();
+  process.exit(1);
+};
+
+const program = require('commander');
+program.version(pkg.version, '-v, --version').parse(process.argv);
+program.option(
+  '-c, --chunk <chunk>',
+  'chunk size, `-` stand for infinity, default: 256',
+  str => (str === '-' ? Infinity : parseInt(str))
+);
+program.option('-f, --flavor <flavor>', `font flavor: ${flavors.join(', ')}`);
+program.option(
+  '-n, --family <family>',
+  'font family, default: parsed from font'
+);
+program.option('-s, --style <style>', 'font style, default: normal');
+program.option('-w, --weight <weight>', 'font weight, default: 400', parseInt);
+program.option('-d, --dry', 'dry run');
+program.option('-q, --quite', 'disable stdout');
+program.option('-o, --output <output>', 'output directory');
+program.arguments(`<fontPath>`).action(target => {
+  fontPath = resolve(target);
+});
+program.parse(process.argv);
+
+const flavor = program.flavor || 'woff2';
+if (!flavors.includes(flavor)) quit();
+const output = resolve(program.output || 'output');
+const chunkSize = program.chunk || 1024;
+const family = program.family;
+const style = program.style || 'normal';
+const weight = program.weight || 400;
+const dryRun = program.dry;
+const quite = program.quite;
+
+if (!fontPath) {
+  quit();
+}
+
+try {
+  fs.readFileSync(fontPath);
+} catch (e) {
+  console.log('error', e);
+}
+
+split({
+  flavor,
+  output,
+  fontPath,
+  chunkSize,
+  family,
+  style,
+  weight,
+  dryRun,
+  quite,
+});

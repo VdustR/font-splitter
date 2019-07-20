@@ -1,0 +1,14 @@
+{
+  "editor.autoIndent": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "eslint.autoFixOnSave": false,
+  "eslint.enable": true,
+  "eslint.validate": ["javascript"],
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "prettier.disableLanguages": [],
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

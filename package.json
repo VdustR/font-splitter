@@ -1,0 +1,81 @@
+{
+  "name": "font-splitter",
+  "version": "0.1.0",
+  "description": "Split the big font file into small subsets",
+  "keywords": [
+    "font",
+    "split",
+    "unicode",
+    "css",
+    "code-range",
+    "fonttools"
+  ],
+  "homepage": "https://github.com/VdustR/font-splitter",
+  "bugs": {
+    "url": "https://github.com/VdustR/font-splitter/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "ViPro",
+    "email": "VdustR@gmail.com",
+    "url": "https://VdustR.github.io"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "bin": {
+    "font-splitter": "./bin/font-splitter"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VdustR/font-splitter.git"
+  },
+  "scripts": {
+    "commit": "git-cz",
+    "version": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md"
+  },
+  "dependencies": {
+    "commander": "^2.20.0",
+    "lodash": "^4.17.15",
+    "mkdirp": "^0.5.1",
+    "slugify": "^1.3.4",
+    "string.prototype.matchall": "^3.0.1"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^8.1.0",
+    "@commitlint/config-conventional": "^8.1.0",
+    "commitizen": "^4.0.1",
+    "conventional-changelog-cli": "^2.0.21",
+    "cz-conventional-changelog": "^2.1.0",
+    "eslint": "^6.0.1",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-config-standard": "^13.0.1",
+    "eslint-plugin-import": "^2.18.0",
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "husky": "^3.0.1",
+    "lint-staged": "^9.2.0",
+    "prettier": "^1.18.2",
+    "typescript": "^3.5.3"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsc --noEmit && lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,html,htm,vue,css,less,scss,md,mdx,yaml,yml}": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.{js,jsx,ts,tsx,vue}": "eslint"
+  }
+}

@@ -1,0 +1,8 @@
+@font-face {
+  font-family: <%= fontFamily %>;
+  font-style: <%= fontStyle %>;
+  font-weight: <%= fontWeight %>;
+  font-display: swap;
+  src: <%= src %>;
+  unicode-range: <%= unicodeRange %>;
+}
