@@ -1,6 +1,6 @@
 {
   "name": "font-splitter",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Split the big font file into small subsets",
   "keywords": [
     "font",

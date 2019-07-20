@@ -35,7 +35,7 @@ Options:
   -c, --chunk <chunk>    chunk size, `-` stand for infinity, default: 256
   -f, --flavor <flavor>  font flavor: woff, woff2
   -n, --family <family>  font family, default: parsed from font
-  -s, --style <style>    font style, default: normal
+  -i, --italic           italic font style, default: false
   -w, --weight <weight>  font weight, default: 400
   -d, --dry              dry run
   -q, --quite            disable stdout
@@ -46,7 +46,7 @@ Options:
 ## Docker
 
 ```sh
-docker run --rm -it -v </path/to/your/font>:/fonts vdustr/font-splitter <font.woff2>
+docker run --rm -it -v </path/to/your/font>:/fonts vdustr/font-splitter <font.woff2> <options>
 ```
 
 ### Build Your Image
