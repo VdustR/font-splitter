@@ -31,9 +31,11 @@ program.option('-w, --weight <weight>', 'font weight, default: 400', parseInt);
 program.option('-d, --dry', 'dry run');
 program.option('-q, --quite', 'disable stdout');
 program.option('-o, --output <output>', 'output directory');
+program.option('-b, --batches <batches>', 'number of chunks to split in parallel, default: 4', parseInt);
 program.arguments(`<fontPath>`).action(target => {
   fontPath = resolve(target);
 });
+
 program.parse(process.argv);
 
 const flavor = program.flavor || 'woff2';
@@ -45,6 +47,7 @@ const italic = program.italic;
 const weight = program.weight || 400;
 const dryRun = program.dry;
 const quite = program.quite;
+const batches = program.batches || 4;
 
 if (!fontPath) {
   quit();
@@ -66,4 +69,5 @@ split({
   weight,
   dryRun,
   quite,
+  batches,
 });

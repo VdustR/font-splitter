@@ -1,10 +1,13 @@
-const { spawnSync, execFileSync } = require('child_process');
+const { spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const chunk = require('lodash/chunk');
 const template = require('lodash/template');
 const mkdirp = require('mkdirp');
 const slugify = require('slugify');
+const pLimit = require('p-limit');
+const util = require('util');
+
 /**
  * replace this with String.prototype.matchAll after node 12.0.0
  */
@@ -96,24 +99,28 @@ const getFontBasename = fontPath => {
   return basename;
 };
 
-const genSubset = ({ splitTarget, flavor, output, fontPath }) => {
-  const { description, codes } = splitTarget;
+const execFile = util.promisify(require('child_process').execFile);
+
+async function genSubset(target, flavor, output, fontPath, i, allTargets) {
+  const { description, codes } = target;
   const unicodeRanges = getUnicodeRanges(codes);
   const targetFontName = `${getFontBasename(fontPath)}.${slugify(
     description
   )}.${flavor}`;
-  execFileSync('pyftsubset', [
+
+  await execFile('pyftsubset', [
     `--unicodes=${unicodeRanges.join(',')}`,
     '--with-zopfli',
     `--flavor=${flavor}`,
     `--output-file=${path.join(output, targetFontName)}`,
     fontPath,
   ]);
+
   return {
     codes,
     targetFontName,
   };
-};
+}
 
 const getSplitTargets = ({ codeBlocks, codes, chunkSize }) => {
   const splitTargets = [];
@@ -183,7 +190,7 @@ const genCss = ({
   );
 };
 
-const genSubsets = ({
+async function genSubsets({
   flavor,
   output,
   fontPath,
@@ -193,37 +200,51 @@ const genSubsets = ({
   weight,
   dryRun,
   quite,
-}) => {
+  batches,
+}) {
   const log = (...args) => {
     if (quite) return;
     console.log(...args);
   };
+
+  // log(this);
+
   const codeBlocks = getAllCodeBlocks();
   log('Calculating...');
   let { fontFamily, locals } = getFontName(fontPath);
   if (family) fontFamily = family;
   log(`Font Family: ${fontFamily}`);
   log(`Locals: ${locals.join(', ')}`);
+  log(`Batch size: ${batches}`);
   const codes = getAllCodes(fontPath);
   const splitTargets = getSplitTargets({ codeBlocks, codes, chunkSize });
   splitTargets.forEach(splitTarget =>
     log(`${splitTarget.description}: ${splitTarget.codes.length}`)
   );
+
   log(`Split total: ${splitTargets.length}`);
   if (dryRun) {
     return;
   }
+
   mkdirp.sync(output);
   log('Fonts generating...');
-  const results = splitTargets.map((splitTarget, i) => {
-    const result = genSubset({ splitTarget, flavor, output, fontPath });
-    log(
-      `${String(i + 1).padStart(String(splitTargets.length).length, 0)}/${
-        splitTargets.length
-      } ${splitTarget.description}`
-    );
-    return result;
-  });
+
+  const limit = pLimit(batches);
+  const results = await Promise.all(
+    splitTargets.map((target, i) =>
+      limit(() => {
+        log(
+          `${String(i + 1).padStart(String(splitTargets.length).length, 0)}/${
+            splitTargets.length
+          } ${target.description}`
+        );
+
+        return genSubset(target, flavor, output, fontPath);
+      })
+    )
+  );
+
   log('Fonts generated!');
   log('CSS generating...');
   genCss({
@@ -238,6 +259,6 @@ const genSubsets = ({
   });
   log('CSS generated!');
   log('Font split success!');
-};
+}
 
 module.exports = genSubsets;
