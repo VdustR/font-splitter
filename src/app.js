@@ -7,6 +7,7 @@ const mkdirp = require('mkdirp');
 const slugify = require('slugify');
 const pLimit = require('p-limit');
 const util = require('util');
+const execFile = util.promisify(require('child_process').execFile);
 
 /**
  * replace this with String.prototype.matchAll after node 12.0.0
@@ -99,9 +100,7 @@ const getFontBasename = fontPath => {
   return basename;
 };
 
-const execFile = util.promisify(require('child_process').execFile);
-
-async function genSubset(target, flavor, output, fontPath, i, allTargets) {
+async function genSubset(target, flavor, output, fontPath) {
   const { description, codes } = target;
   const unicodeRanges = getUnicodeRanges(codes);
   const targetFontName = `${getFontBasename(fontPath)}.${slugify(
@@ -206,8 +205,6 @@ async function genSubsets({
     if (quite) return;
     console.log(...args);
   };
-
-  // log(this);
 
   const codeBlocks = getAllCodeBlocks();
   log('Calculating...');

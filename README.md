@@ -31,16 +31,17 @@ $ font-splitter
 Usage: font-splitter [options] <fontPath>
 
 Options:
-  -v, --version          output the version number
-  -c, --chunk <chunk>    chunk size, `-` stand for infinity, default: 256
-  -f, --flavor <flavor>  font flavor: woff, woff2
-  -n, --family <family>  font family, default: parsed from font
-  -i, --italic           italic font style, default: false
-  -w, --weight <weight>  font weight, default: 400
-  -d, --dry              dry run
-  -q, --quite            disable stdout
-  -o, --output <output>  output directory
-  -h, --help             output usage information
+  -v, --version            output the version number
+  -c, --chunk <chunk>      chunk size, `-` stand for infinity, default: 256
+  -f, --flavor <flavor>    font flavor: woff, woff2
+  -n, --family <family>    font family, default: parsed from font
+  -i, --italic             italic font style, default: false
+  -w, --weight <weight>    font weight, default: 400
+  -d, --dry                dry run
+  -q, --quite              disable stdout
+  -o, --output <output>    output directory
+  -b, --batches <batches>  number of chunks to split in parallel, default: 4
+  -h, --help               output usage information
 ```
 
 ## Docker
