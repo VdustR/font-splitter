@@ -22,12 +22,12 @@ jobs:
           config-file: .github/release-please-config.json
           manifest-file: .release-please-manifest.json
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         if: ${{ steps.release.outputs.release_created == 'true' }}
         with:
           ref: ${{ steps.release.outputs.tag_name }}
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         if: ${{ steps.release.outputs.release_created == 'true' }}
         with:
           python-version: "3.12"
