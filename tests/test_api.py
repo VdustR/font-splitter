@@ -2,13 +2,19 @@ from io import BytesIO
 import logging
 from pathlib import Path
 
+import pytest
+import tinycss2
 from fontTools import subset
 from fontTools.ttLib import TTFont
 
 from font_splitter.api import split_font, split_font_to_memory
 from font_splitter.css_source import FontCssSource
 from font_splitter.unicode_blocks import UnicodeBlockSource
-from tests.helpers import build_multiblock_test_font, build_test_font
+from tests.helpers import (
+    build_multiblock_test_font,
+    build_test_font,
+    build_test_font_with_family_name,
+)
 
 
 def test_split_font_to_memory_defaults_to_unicode_blocks_and_auto_local_names():
@@ -16,8 +22,10 @@ def test_split_font_to_memory_defaults_to_unicode_blocks_and_auto_local_names():
 
     assert "POC-Test.Basic-Latin.woff2" in result.assets
     css_asset = result.assets["POC-Test.css"].decode("utf-8")
-    assert "local('POC Test Regular')" in css_asset
-    assert "format('woff2')" in css_asset
+    assert 'local("POC Test Regular")' in css_asset
+    assert "url(POC-Test.Basic-Latin.woff2)" in css_asset
+    assert "url(url(" not in css_asset
+    assert 'format("woff2")' in css_asset
 
 
 def test_split_font_to_memory_accepts_file_like_input():
@@ -37,11 +45,94 @@ def test_split_font_to_memory_escapes_css_strings_and_outputs_metadata():
     )
 
     css_asset = result.assets["Acme-s-Font.css"].decode("utf-8")
-    assert "font-family: 'Acme\\'s Font';" in css_asset
+    assert 'font-family: "Acme\'s Font";' in css_asset
     assert "font-style: italic;" in css_asset
     assert "font-weight: 700;" in css_asset
     assert "font-stretch: condensed;" in css_asset
-    assert "local('Acme\\'s Local')" in css_asset
+    assert 'local("Acme\'s Local")' in css_asset
+
+
+def test_split_font_to_memory_escapes_font_name_linefeeds_in_css_strings():
+    result = split_font_to_memory(
+        build_test_font_with_family_name("HanaMinA\r\n"),
+        max_codepoints=None,
+    )
+
+    css_asset = result.assets["HanaMinA.css"].decode("utf-8")
+    assert "\r" not in css_asset
+    assert "HanaMinA\n" not in css_asset
+    assert "HanaMinA\\D \\A " in css_asset
+
+    rules = tinycss2.parse_stylesheet(css_asset, skip_comments=True, skip_whitespace=True)
+    assert len(rules) == 1
+    assert rules[0].type == "at-rule"
+    declarations = tinycss2.parse_declaration_list(
+        rules[0].content,
+        skip_comments=True,
+        skip_whitespace=True,
+    )
+    assert all(declaration.type == "declaration" for declaration in declarations)
+
+
+def test_split_font_to_memory_escapes_double_quotes_in_css_strings():
+    result = split_font_to_memory(
+        build_test_font(),
+        family='Quote "Test"',
+        local_src=['Local "Name"'],
+        max_codepoints=None,
+    )
+
+    css_asset = result.assets["Quote-Test.css"].decode("utf-8")
+    assert 'font-family: "Quote \\"Test\\"";' in css_asset
+    assert 'local("Local \\"Name\\"")' in css_asset
+
+    rules = tinycss2.parse_stylesheet(css_asset, skip_comments=True, skip_whitespace=True)
+    declarations = tinycss2.parse_declaration_list(
+        rules[0].content,
+        skip_comments=True,
+        skip_whitespace=True,
+    )
+    family_declaration = next(
+        declaration
+        for declaration in declarations
+        if declaration.type == "declaration" and declaration.name == "font-family"
+    )
+    family_tokens = [
+        token for token in family_declaration.value
+        if token.type != "whitespace"
+    ]
+    assert family_tokens[0].value == 'Quote "Test"'
+
+
+def test_split_font_to_memory_preserves_multi_token_css_component_values():
+    result = split_font_to_memory(
+        build_test_font(),
+        style="oblique 10deg",
+        stretch="75%",
+        max_codepoints=None,
+    )
+
+    css_asset = result.assets["POC-Test.css"].decode("utf-8")
+    assert "font-style: oblique 10deg;" in css_asset
+    assert "font-stretch: 75%;" in css_asset
+
+
+def test_split_font_to_memory_rejects_css_declaration_breakers_in_component_values():
+    with pytest.raises(ValueError, match="Invalid CSS value for font-style"):
+        split_font_to_memory(
+            build_test_font(),
+            style="normal; src: url(evil.woff2)",
+            max_codepoints=None,
+        )
+
+
+def test_split_font_to_memory_rejects_empty_component_values():
+    with pytest.raises(ValueError, match="Invalid CSS value for font-style"):
+        split_font_to_memory(
+            build_test_font(),
+            style="   ",
+            max_codepoints=None,
+        )
 
 
 def test_split_font_to_memory_generates_css_and_woff2_assets():
@@ -113,7 +204,7 @@ def test_split_font_writes_assets_to_disk(tmp_path: Path):
     assert (tmp_path / "POC-Test.css").exists()
     TTFont(tmp_path / "POC-Test.Basic-Latin.woff")
     css = (tmp_path / "POC-Test.css").read_text(encoding="utf-8")
-    assert "local('POC Test Regular')" in css
+    assert 'local("POC Test Regular")' in css
     assert result.assets == {}
     assert result.assets_written
 

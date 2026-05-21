@@ -7,7 +7,9 @@ from os import PathLike
 from pathlib import Path
 from typing import Any
 
+import tinycss2
 from fontTools.ttLib import TTFont
+from tinycss2.serializer import serialize_string_value, serialize_url
 
 from .planner import Plan, PlannedBucket, plan_buckets
 from .ranges import compress_codepoints
@@ -311,17 +313,19 @@ def _font_face_css(
     local_names: list[str],
 ) -> str:
     sources = [
-        *(f"local('{_css_string(name)}')" for name in local_names),
-        f"url({file_name}) format('{_css_string(flavor)}')",
+        *(f"local({_css_quoted_string(name)})" for name in local_names),
+        f"url({_css_url(file_name)}) format({_css_quoted_string(flavor)})",
     ]
     lines = [
         "@font-face {",
-        f"  font-family: '{_css_string(family)}';",
-        f"  font-style: {_css_identifier(style)};",
-        f"  font-weight: {weight};",
+        f"  font-family: {_css_quoted_string(family)};",
+        f"  font-style: {_css_component_value(style, property_name='font-style')};",
+        f"  font-weight: {_css_component_value(weight, property_name='font-weight')};",
     ]
     if stretch:
-        lines.append(f"  font-stretch: {_css_identifier(stretch)};")
+        lines.append(
+            f"  font-stretch: {_css_component_value(stretch, property_name='font-stretch')};"
+        )
     lines.extend(
         [
             "  font-display: swap;",
@@ -355,9 +359,37 @@ def _split_stats(plan: Plan, *, base: str, flavor: str) -> SplitStats:
     )
 
 
-def _css_string(value: Any) -> str:
-    return str(value).replace("\\", "\\\\").replace("'", "\\'")
+def _css_quoted_string(value: Any) -> str:
+    return f'"{serialize_string_value(_css_string_value(value))}"'
 
 
-def _css_identifier(value: Any) -> str:
-    return str(value).replace(";", "").replace("{", "").replace("}", "").strip()
+def _css_url(value: Any) -> str:
+    return serialize_url(_css_string_value(value))
+
+
+def _css_string_value(value: Any) -> str:
+    return str(value).replace("\x00", "\uFFFD")
+
+
+def _css_component_value(value: Any, *, property_name: str) -> str:
+    raw_value = _css_string_value(value)
+    normalized = raw_value.replace("\r\n", " ").replace("\r", " ").replace("\n", " ")
+    if not normalized.strip():
+        raise ValueError(f"Invalid CSS value for {property_name}: {raw_value!r}")
+    tokens = tinycss2.parse_component_value_list(
+        normalized,
+        skip_comments=True,
+    )
+    serialized = tinycss2.serialize(tokens).strip()
+    if not serialized or _contains_unsafe_css_component(tokens):
+        raise ValueError(f"Invalid CSS value for {property_name}: {raw_value!r}")
+    return serialized
+
+
+def _contains_unsafe_css_component(tokens: list[Any]) -> bool:
+    for token in tokens:
+        if token.type == "error":
+            return True
+        if token.type == "literal" and token.value in {";", "{", "}"}:
+            return True
+    return False

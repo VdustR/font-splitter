@@ -9,6 +9,10 @@ def build_test_font() -> bytes:
     return _build_font([0x20, 0x41, 0x42, 0x43], family_name="POC Test")
 
 
+def build_test_font_with_family_name(family_name: str) -> bytes:
+    return _build_font([0x41], family_name=family_name)
+
+
 def build_multiblock_test_font() -> bytes:
     return _build_font(
         [0x20, 0x41, 0x0100, 0x2600, 0x4E00],
