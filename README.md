@@ -178,7 +178,7 @@ docker run --rm -v "$PWD:/fonts" vdustr/font-splitter:v0.2.1 input.ttf --output 
 ```
 <!-- x-release-please-end -->
 
-`latest` follows the latest GitHub release. Version tags are also published without the `v` prefix, such as `vdustr/font-splitter:0.2.0`.
+`latest` follows the latest GitHub release. Version tags are also published without the `v` prefix, such as `vdustr/font-splitter:0.2.1`.
 
 Docker tags before `v0.2.0` contain the legacy Node.js implementation. Use `v0.2.0` or newer for the Python package.
 
@@ -233,12 +233,12 @@ Releases are managed with Release Please on `main`.
 - Use Conventional Commit titles for merged changes. `fix:` produces a patch release, `feat:` produces a minor release, and `!` or `BREAKING CHANGE:` marks a breaking change. While the package is still `0.x`, breaking changes bump the minor version.
 - PR titles are checked against the Conventional Commits format. This keeps squash-merge commit titles compatible with Release Please.
 - Release Please opens or updates a release PR that updates `CHANGELOG.md`, `pyproject.toml`, `.release-please-manifest.json`, and versioned README install examples.
-- Merging the release PR creates the GitHub Release tag. The release workflow then builds the wheel and source distribution and uploads them as GitHub Release assets.
-- The Docker workflow publishes `vdustr/font-splitter` to Docker Hub on GitHub Release publication when `DOCKERHUB_TOKEN` is configured. It publishes `vX.Y.Z`, `X.Y.Z`, and `latest` tags.
+- Merging the release PR creates the GitHub Release tag. The release workflow then builds the wheel and source distribution, uploads them as GitHub Release assets, and publishes `vdustr/font-splitter` to Docker Hub when `DOCKERHUB_TOKEN` is configured.
+- Docker images are published as `vX.Y.Z`, `X.Y.Z`, and `latest` tags. The separate Docker workflow is manual-only and is used to backfill or repair an existing release image.
 - If Release Please PR checks must run automatically, configure `RELEASE_PLEASE_TOKEN`; otherwise the workflow falls back to GitHub's default token.
 - PyPI publishing is intentionally not configured yet. The documented install path is the GitHub tag URL.
 
-The current Python rewrite bootstraps from the last npm release, `v0.1.5`, toward `v0.2.0`.
+Release Please was bootstrapped from the last npm release, `v0.1.5`. The first Python release was `v0.2.0`.
 
 ### Test Fixture Policy
 
