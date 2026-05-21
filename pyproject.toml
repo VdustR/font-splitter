@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling>=1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "font-splitter"
+version = "0.2.0"
+description = "Split large fonts into unicode-range webfont subsets"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+  { name = "ViPro", email = "VdustR@gmail.com" },
+]
+keywords = ["font", "split", "unicode", "unicode-range", "fonttools"]
+dependencies = [
+  "Brotli>=1.1.0",
+  "fonttools[woff]>=4.63.0",
+  "tinycss2>=1.4.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/VdustR/font-splitter"
+Issues = "https://github.com/VdustR/font-splitter/issues"
+
+[project.scripts]
+font-splitter = "font_splitter.cli:main"
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8.2.0",
+]
+dev = [
+  "build>=1.2.2",
+  "pytest>=8.2.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/font_splitter"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

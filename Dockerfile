@@ -1,13 +1,9 @@
-FROM sandinh/fonttools
-RUN apk add --no-cache \
-  nodejs \
-  yarn
-WORKDIR /font-splitter
-COPY ./package.json .
-COPY ./yarn.lock .
-RUN yarn --prod
-ENV PATH="/font-splitter/bin:${PATH}"
-COPY ./bin bin
-COPY ./src src
+FROM python:3.12-slim
+
+WORKDIR /app
+COPY pyproject.toml README.md LICENSE ./
+COPY src ./src
+RUN python -m pip install --no-cache-dir .
+
 WORKDIR /fonts
-ENTRYPOINT [ "font-splitter" ]
+ENTRYPOINT ["font-splitter"]
