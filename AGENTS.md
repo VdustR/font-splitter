@@ -67,7 +67,6 @@ FONT_SPLITTER_FIXTURE_SHA256=<sha256> \
 - Docker image tags are `vX.Y.Z`, `X.Y.Z`, and `latest` for normal releases.
 - `.github/workflows/docker.yml` is manual-only and is used to backfill or repair an existing release tag.
 - To backfill an already-created release after Docker workflow changes, first set `DOCKERHUB_TOKEN`, then run `gh workflow run docker.yml --repo VdustR/font-splitter -f release_tag=v0.2.1 -f latest=true`.
-- `.github/workflows/dockerhub-metadata.yml` updates Docker Hub's short description and overview from `.github/dockerhub/README.md`. Run it manually after metadata-only edits, or let it run automatically when the metadata file changes on `main`.
 - PyPI publishing is not configured yet. Keep the documented install path as a GitHub tag URL until PyPI Trusted Publishing is intentionally added.
 
 ## Git Safety
