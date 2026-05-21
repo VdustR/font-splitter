@@ -170,16 +170,22 @@ By default, Font Splitter uses `UnicodeBlockSource` as the fallback. Passing CSS
 
 ## Docker
 
-Build:
+Use the published Docker Hub image:
+
+<!-- x-release-please-start-version -->
+```sh
+docker run --rm -v "$PWD:/fonts" vdustr/font-splitter:v0.2.0 input.ttf --output output
+```
+<!-- x-release-please-end -->
+
+`latest` follows the latest GitHub release. Version tags are also published without the `v` prefix, such as `vdustr/font-splitter:0.2.0`.
+
+Docker tags before `v0.2.0` contain the legacy Node.js implementation. Use `v0.2.0` or newer for the Python package.
+
+Build locally:
 
 ```sh
 docker build -t font-splitter .
-```
-
-Run:
-
-```sh
-docker run --rm -v "$PWD:/fonts" font-splitter input.ttf --output output
 ```
 
 ## Migration From v1
@@ -228,6 +234,7 @@ Releases are managed with Release Please on `main`.
 - PR titles are checked against the Conventional Commits format. This keeps squash-merge commit titles compatible with Release Please.
 - Release Please opens or updates a release PR that updates `CHANGELOG.md`, `pyproject.toml`, `.release-please-manifest.json`, and versioned README install examples.
 - Merging the release PR creates the GitHub Release tag. The release workflow then builds the wheel and source distribution and uploads them as GitHub Release assets.
+- The Docker workflow publishes `vdustr/font-splitter` to Docker Hub on GitHub Release publication when `DOCKERHUB_TOKEN` is configured. It publishes `vX.Y.Z`, `X.Y.Z`, and `latest` tags.
 - If Release Please PR checks must run automatically, configure `RELEASE_PLEASE_TOKEN`; otherwise the workflow falls back to GitHub's default token.
 - PyPI publishing is intentionally not configured yet. The documented install path is the GitHub tag URL.
 

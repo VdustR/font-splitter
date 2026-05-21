@@ -63,6 +63,9 @@ FONT_SPLITTER_FIXTURE_SHA256=<sha256> \
 - The workflow uses `RELEASE_PLEASE_TOKEN` when configured and falls back to `GITHUB_TOKEN`. Use `RELEASE_PLEASE_TOKEN` if release PR checks must run automatically from bot-created PR events.
 - The Release Please PR should update `CHANGELOG.md`, `pyproject.toml`, `.release-please-manifest.json`, and versioned README install examples.
 - Merging the Release Please PR creates the GitHub Release tag. The same workflow builds wheel and sdist artifacts and uploads them to the GitHub Release.
+- `.github/workflows/docker.yml` publishes `vdustr/font-splitter` to Docker Hub on GitHub Release publication. It requires a Docker Hub access token stored as the repo secret `DOCKERHUB_TOKEN`.
+- Docker image tags are `vX.Y.Z`, `X.Y.Z`, and `latest` for normal releases. The workflow also supports manual dispatch for backfilling an existing release tag.
+- To backfill an already-created release after Docker workflow changes, first set `DOCKERHUB_TOKEN`, then run `gh workflow run docker.yml --repo VdustR/font-splitter -f release_tag=v0.2.0 -f latest=true`.
 - PyPI publishing is not configured yet. Keep the documented install path as a GitHub tag URL until PyPI Trusted Publishing is intentionally added.
 
 ## Git Safety
