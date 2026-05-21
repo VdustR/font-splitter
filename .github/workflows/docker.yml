@@ -1,9 +1,6 @@
 name: Docker
 
 on:
-  release:
-    types:
-      - published
   workflow_dispatch:
     inputs:
       release_tag:
@@ -24,7 +21,7 @@ env:
 
 jobs:
   publish:
-    name: Publish Docker Hub image
+    name: Backfill Docker Hub image
     runs-on: ubuntu-latest
 
     steps:
@@ -32,13 +29,8 @@ jobs:
         id: release
         shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            release_tag="${{ inputs.release_tag }}"
-            publish_latest="${{ inputs.latest }}"
-          else
-            release_tag="${{ github.event.release.tag_name }}"
-            publish_latest="${{ github.event.release.prerelease == false }}"
-          fi
+          release_tag="${{ inputs.release_tag }}"
+          publish_latest="${{ inputs.latest }}"
 
           if [[ ! "$release_tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
             echo "Expected a release tag like v0.2.0, got: $release_tag" >&2
