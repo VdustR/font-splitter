@@ -30,7 +30,13 @@ def subset_font(font: FontInput, codepoints: set[int], *, flavor: str) -> Subset
     options.flavor = flavor
     options.set(layout_features="*")
     subsetter = subset.Subsetter(options=options)
-    subsetter.populate(unicodes=sorted(codepoints))
+    variation_selectors = {
+        selector
+        for table in ttfont["cmap"].tables
+        if table.format == 14
+        for selector in table.uvsDict
+    }
+    subsetter.populate(unicodes=sorted(codepoints | variation_selectors))
     warnings: list[str] = []
     handler = _WarningCaptureHandler(warnings)
     logger = logging.getLogger("fontTools")

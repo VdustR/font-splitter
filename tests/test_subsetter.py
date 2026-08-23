@@ -5,7 +5,7 @@ from fontTools import subset
 from fontTools.ttLib import TTFont
 
 from font_splitter.subsetter import subset_font, subset_font_to_bytes
-from tests.helpers import build_test_font
+from tests.helpers import build_test_font, build_variation_sequence_test_font
 
 
 def test_subset_to_woff2_bytes_roundtrips():
@@ -22,6 +22,30 @@ def test_subset_to_woff_bytes_roundtrips():
     assert out[:4] == b"wOFF"
     font = TTFont(BytesIO(out))
     assert set(font.getBestCmap()) == {0x41}
+
+
+def test_subset_preserves_only_variation_sequences_for_included_bases():
+    raw = build_variation_sequence_test_font()
+
+    out = subset_font_to_bytes(raw, {0x41}, flavor="woff2")
+
+    font = TTFont(BytesIO(out))
+    variation_cmap = next(table for table in font["cmap"].tables if table.format == 14)
+    assert set(variation_cmap.uvsDict) == {0xE0100}
+    assert len(variation_cmap.uvsDict[0xE0100]) == 1
+    base, variant_glyph = variation_cmap.uvsDict[0xE0100][0]
+    assert base == 0x41
+    assert variant_glyph is not None
+    assert variant_glyph != font.getBestCmap()[0x41]
+    assert set(font.getBestCmap()) == {0x41}
+    assert len(font.getGlyphOrder()) == 3
+
+    default_out = subset_font_to_bytes(raw, {0x42}, flavor="woff2")
+    default_font = TTFont(BytesIO(default_out))
+    default_variation_cmap = next(
+        table for table in default_font["cmap"].tables if table.format == 14
+    )
+    assert default_variation_cmap.uvsDict == {0xE0100: [(0x42, None)]}
 
 
 def test_subset_captures_fonttools_warnings(monkeypatch):
