@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/VdustR/font-splitter/compare/v0.2.1...v0.2.2) (2026-08-23)
+
+
+### Bug Fixes
+
+* preserve cmap variation sequences ([#27](https://github.com/VdustR/font-splitter/issues/27)) ([95ee7ab](https://github.com/VdustR/font-splitter/commit/95ee7aba28f8abc9b00a7f2546a2f0f1ec15cf1d))
+
 ## [0.2.1](https://github.com/VdustR/font-splitter/compare/v0.2.0...v0.2.1) (2026-05-21)
 
 

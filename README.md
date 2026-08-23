@@ -18,7 +18,7 @@ Install a released tag:
 
 <!-- x-release-please-start-version -->
 ```sh
-python -m pip install "font-splitter @ git+https://github.com/VdustR/font-splitter.git@v0.2.1"
+python -m pip install "font-splitter @ git+https://github.com/VdustR/font-splitter.git@v0.2.2"
 ```
 <!-- x-release-please-end -->
 
@@ -26,7 +26,7 @@ For CLI-only usage, `pipx` keeps the command isolated:
 
 <!-- x-release-please-start-version -->
 ```sh
-pipx install "font-splitter @ git+https://github.com/VdustR/font-splitter.git@v0.2.1"
+pipx install "font-splitter @ git+https://github.com/VdustR/font-splitter.git@v0.2.2"
 ```
 <!-- x-release-please-end -->
 
@@ -180,7 +180,7 @@ Use the published Docker Hub image:
 
 <!-- x-release-please-start-version -->
 ```sh
-docker run --rm -v "$PWD:/fonts" vdustr/font-splitter:v0.2.1 input.ttf --output output
+docker run --rm -v "$PWD:/fonts" vdustr/font-splitter:v0.2.2 input.ttf --output output
 ```
 <!-- x-release-please-end -->
 
