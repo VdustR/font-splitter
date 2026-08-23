@@ -157,6 +157,12 @@ print(plan.stats.fallback_codepoint_count)
 
 Sources are ordered. Earlier sources win overlaps, and later sources only receive remaining codepoints that exist in the target font cmap.
 
+When the source font contains a cmap format 14 subtable, each generated subset
+also preserves the variation sequences whose base codepoint belongs to that
+subset. Variation selectors do not count toward `max_codepoints` or appear in
+the generated CSS `unicode-range`; FontTools filters format 14 mappings to the
+requested base codepoints during subsetting.
+
 Supported sources:
 
 - `FontCssSource`: parses generic `@font-face` rules with `unicode-range` descriptors from a local CSS file.

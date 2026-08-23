@@ -3,6 +3,8 @@ from collections.abc import Iterable
 
 from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.ttGlyphPen import TTGlyphPen
+from fontTools.ttLib import TTFont
+from fontTools.ttLib.tables._c_m_a_p import CmapSubtable
 
 
 def build_test_font() -> bytes:
@@ -18,6 +20,34 @@ def build_multiblock_test_font() -> bytes:
         [0x20, 0x41, 0x0100, 0x2600, 0x4E00],
         family_name="Fixture Test",
     )
+
+
+def build_variation_sequence_test_font() -> bytes:
+    raw = _build_font(
+        [0x41, 0x42, 0xE000],
+        family_name="Variation Sequence Test",
+    )
+    font = TTFont(BytesIO(raw))
+    glyph_order = font.getGlyphOrder()
+    variant_glyph = "A.var"
+    glyph_order.append(variant_glyph)
+    font.setGlyphOrder(glyph_order)
+    pen = TTGlyphPen(None)
+    font["glyf"][variant_glyph] = pen.glyph()
+    font["hmtx"][variant_glyph] = (600, 0)
+    font["maxp"].numGlyphs = len(glyph_order)
+
+    variation_cmap = CmapSubtable.newSubtable(14)
+    variation_cmap.platformID = 0
+    variation_cmap.platEncID = 5
+    variation_cmap.language = 0
+    variation_cmap.cmap = {}
+    variation_cmap.uvsDict = {0xE0100: [(0x41, variant_glyph), (0x42, None)]}
+    font["cmap"].tables.append(variation_cmap)
+
+    out = BytesIO()
+    font.save(out)
+    return out.getvalue()
 
 
 def _build_font(codepoints: Iterable[int], *, family_name: str) -> bytes:
